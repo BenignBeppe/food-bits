@@ -7,6 +7,19 @@
             label="New ingredient"
             @keypress.enter="addIngredient"
         ></v-text-field>
+        <v-number-input
+            v-model="newIngredientCarbs"
+            label="Carbs"
+            @keypress.enter="addIngredient"
+            :min="0"
+        ></v-number-input>
+        <v-number-input
+            v-model="newIngredientSugar"
+            label="Sugar"
+            @keypress.enter="addIngredient"
+            :min="0"
+            :max="newIngredientCarbs"
+        ></v-number-input>
         <v-btn prepend-icon="mdi-plus" @click="addIngredient">
             Add ingredient
         </v-btn>
@@ -31,12 +44,22 @@
 import { ref, type Ref } from "vue";
 
 let newIngredientName = ref("");
-let ingredients: Ref<{name: string}[]> = ref([]);
+let newIngredientCarbs = ref(0);
+let newIngredientSugar = ref(0);
+let ingredients: Ref<{name: string, carbs: number, sugar: number}[]> = ref([]);
 
 let headers = [
     {
         key: "name",
         title: "Name"
+    },
+    {
+        key: "carbs",
+        title: "Carbs"
+    },
+    {
+        key: "sugar",
+        title: "Sugar"
     },
     {
         key: "remove",
@@ -58,7 +81,16 @@ function addIngredient() {
         return;
     }
 
-    ingredients.value.push({name: newIngredientName.value});
+    if(newIngredientSugar.value > newIngredientCarbs.value) {
+        // There can't be more sugar than total carbs.
+        return;
+    }
+
+    ingredients.value.push({
+        name: newIngredientName.value,
+        carbs: newIngredientCarbs.value,
+        sugar: newIngredientSugar.value
+    });
 }
 
 function isEquivalent(string1: string, string2: string): boolean {
