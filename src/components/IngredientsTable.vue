@@ -2,15 +2,25 @@
 
 <v-toolbar>
     <template v-slot:default>
-        <v-text-field v-model="newIngredientName" label="New ingredient"></v-text-field>
-        <v-btn prepend-icon="mdi-plus" @click="addIngredient">Add ingredient</v-btn>
+        <v-text-field
+            v-model="newIngredientName"
+            label="New ingredient"
+            @keypress.enter="addIngredient"
+        ></v-text-field>
+        <v-btn prepend-icon="mdi-plus" @click="addIngredient">
+            Add ingredient
+        </v-btn>
     </template>
 </v-toolbar>
 
 <v-data-table :headers="headers" :items="ingredients" hide-default-footer>
     <!-- eslint-disable-next-line vue/valid-v-slot this is from the example, not sure why linting dislikes -->
     <template v-slot:item.remove={item}>
-        <v-btn icon="mdi-delete" variant="flat" @click="removeIngredient(item.name)"></v-btn>
+        <v-btn
+            icon="mdi-delete"
+            variant="flat"
+            @click="removeIngredient(item.name)"
+        ></v-btn>
     </template>
 </v-data-table>
 
