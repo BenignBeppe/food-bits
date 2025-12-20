@@ -9,8 +9,8 @@
 
 <v-data-table :headers="headers" :items="ingredients" hide-default-footer>
     <!-- eslint-disable-next-line vue/valid-v-slot this is from the example, not sure why linting dislikes -->
-    <template v-slot:item.remove>
-        <v-btn icon="mdi-delete" variant="flat" @click="removeIngredient"></v-btn>
+    <template v-slot:item.remove={item}>
+        <v-btn icon="mdi-delete" variant="flat" @click="removeIngredient(item.name)"></v-btn>
     </template>
 </v-data-table>
 
