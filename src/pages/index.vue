@@ -1,5 +1,6 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <HelloWorld />
+    <IngredientsTable />
 </template>
 
 <script lang="ts" setup>
