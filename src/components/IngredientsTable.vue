@@ -73,20 +73,23 @@
 
 <script setup lang="ts">
 
-import { computed, ref, type Ref } from "vue";
+import { computed, ref } from "vue";
+import { useStorage } from "@vueuse/core";
 
 let newIngredientName = ref("");
 let newIngredientWeight = ref(100);
 let newIngredientCarbs = ref(0);
 let newIngredientSugar = ref(0);
 let servingWeight = ref(100);
+
 interface Ingredient {
     name: string;
     weight: number;
     carbs: number;
     sugar: number;
 }
-let recipe: Ref<Ingredient[]> = ref([]);
+let defaultRecipe: Ingredient[] = [];
+const recipe = useStorage("recipe", defaultRecipe);
 
 let headers = [
     {
