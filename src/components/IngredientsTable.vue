@@ -3,11 +3,12 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <v-text-field
-                v-model="newIngredientName"
+            <v-combobox
                 label="New ingredient"
+                :items="ingredientNames"
+                v-model="newIngredientName"
                 @keypress.enter="addIngredient"
-            ></v-text-field>
+            ></v-combobox>
         </v-col>
         <v-col cols="6" md="3">
             <v-number-input
@@ -23,6 +24,7 @@
                 label="Carbs (g/100 g)"
                 @keypress.enter="addIngredient"
                 :min="0"
+                :precision="1"
             ></v-number-input>
         </v-col>
         <v-col cols="6" md="3">
@@ -31,6 +33,7 @@
                 label="Sugar (g/100 g)"
                 @keypress.enter="addIngredient"
                 :min="0"
+                :precision="1"
             ></v-number-input>
         </v-col>
         <v-col cols="6" md="3">
@@ -73,9 +76,13 @@
 
 <script setup lang="ts">
 
-import { computed, ref } from "vue";
+import { computed, ref, watch, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 
+import { fetchIngredient, fetchIngredients } from "../apiConnector.ts";
+
+let availableIngredients: object;
+let ingredientNames: Ref<string[]> = ref([]);
 let newIngredientName = ref("");
 let newIngredientWeight = ref(100);
 let newIngredientCarbs = ref(0);
@@ -115,6 +122,31 @@ let headers = [
     }
 ];
 
+loadIngredients();
+
+async function loadIngredients() {
+    availableIngredients = await fetchIngredients();
+    ingredientNames.value = Object.values(availableIngredients).map((i) => i.name);
+}
+
+watch(newIngredientName, async () => {
+    let id;
+    for(let i of Object.entries(availableIngredients)) {
+        if(i[1].name === newIngredientName.value) {
+            id = i[0];
+            break;
+        }
+    }
+    let ingredientValues = await fetchIngredient(id);
+    for(let value of ingredientValues) {
+        if(value.euroFIRkod === "CHO") {
+            newIngredientCarbs.value = value.varde;
+        } else if(value.euroFIRkod === "SUGAR") {
+            newIngredientSugar.value = value.varde;
+        }
+    }
+});
+
 function addIngredient() {
     if(!newIngredientName.value.trim()) {
         // No name.
@@ -125,11 +157,6 @@ function addIngredient() {
         (i) => isEquivalent(i.name, newIngredientName.value)
     )) {
         // Already exists.
-        return;
-    }
-
-    if(newIngredientSugar.value > newIngredientCarbs.value) {
-        // There can't be more sugar than total carbs.
         return;
     }
 
