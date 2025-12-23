@@ -58,7 +58,7 @@
     </v-card>
 </v-container>
 
-<v-data-table :headers="headers" :items="ingredients" hide-default-footer>
+<v-data-table :headers="headers" :items="recipe" hide-default-footer>
     <!-- eslint-disable-next-line vue/valid-v-slot this is from the example, not sure why linting dislikes -->
     <template v-slot:item.remove={item}>
         <v-btn
@@ -86,7 +86,7 @@ interface Ingredient {
     carbs: number;
     sugar: number;
 }
-let ingredients: Ref<Ingredient[]> = ref([]);
+let recipe: Ref<Ingredient[]> = ref([]);
 
 let headers = [
     {
@@ -118,7 +118,7 @@ function addIngredient() {
         return;
     }
 
-    if(ingredients.value.some(
+    if(recipe.value.some(
         (i) => isEquivalent(i.name, newIngredientName.value)
     )) {
         // Already exists.
@@ -130,7 +130,7 @@ function addIngredient() {
         return;
     }
 
-    ingredients.value.push({
+    recipe.value.push({
         name: newIngredientName.value,
         weight: newIngredientWeight.value,
         carbs: newIngredientCarbs.value,
@@ -143,26 +143,25 @@ function isEquivalent(string1: string, string2: string): boolean {
 }
 
 function removeIngredient(name: string) {
-    let index = ingredients.value.findIndex(i => i.name === name);
-    ingredients.value.splice(index, 1);
+    let index = recipe.value.findIndex(i => i.name === name);
+    recipe.value.splice(index, 1);
 }
 
 let serving = computed(() => {
-    if(!ingredients.value.length) {
+    if(!recipe.value.length) {
         return { carbs: 0, sugar: 0 };
     }
 
     let carbsWeight = 0;
     let sugarWeight = 0;
     let recipeWeight = 0;
-    ingredients.value.forEach((i) => { recipeWeight += i.weight; });
-    ingredients.value.forEach((i) => {
+    recipe.value.forEach((i) => { recipeWeight += i.weight; });
+    recipe.value.forEach((i) => {
         carbsWeight += i.carbs / 100 * i.weight;
         sugarWeight += i.sugar / 100 * i.weight;
     });
     let partCarbs = carbsWeight / recipeWeight;
     let partSugar = sugarWeight / recipeWeight;
-    console.log(partCarbs);
     let totals = {
         carbs: partCarbs * servingWeight.value,
         sugar: partSugar * servingWeight.value
