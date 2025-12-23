@@ -1,30 +1,62 @@
 <template>
 
-<v-toolbar>
-    <template v-slot:default>
-        <v-text-field
-            v-model="newIngredientName"
-            label="New ingredient"
-            @keypress.enter="addIngredient"
-        ></v-text-field>
-        <v-number-input
-            v-model="newIngredientCarbs"
-            label="Carbs"
-            @keypress.enter="addIngredient"
-            :min="0"
-        ></v-number-input>
-        <v-number-input
-            v-model="newIngredientSugar"
-            label="Sugar"
-            @keypress.enter="addIngredient"
-            :min="0"
-            :max="newIngredientCarbs"
-        ></v-number-input>
-        <v-btn prepend-icon="mdi-plus" @click="addIngredient">
-            Add ingredient
-        </v-btn>
-    </template>
-</v-toolbar>
+<v-container>
+    <v-row>
+        <v-col cols="12">
+            <v-text-field
+                v-model="newIngredientName"
+                label="New ingredient"
+                @keypress.enter="addIngredient"
+            ></v-text-field>
+        </v-col>
+        <v-col cols="6" md="3">
+            <v-number-input
+                v-model="newIngredientWeight"
+                label="Weight (g)"
+                @keypress.enter="addIngredient"
+                :min="1"
+            ></v-number-input>
+        </v-col>
+        <v-col cols="6" md="3">
+            <v-number-input
+                v-model="newIngredientCarbs"
+                label="Carbs (g/100 g)"
+                @keypress.enter="addIngredient"
+                :min="0"
+            ></v-number-input>
+        </v-col>
+        <v-col cols="6" md="3">
+            <v-number-input
+                v-model="newIngredientSugar"
+                label="Sugar (g/100 g)"
+                @keypress.enter="addIngredient"
+                :min="0"
+            ></v-number-input>
+        </v-col>
+        <v-col cols="6" md="3">
+            <v-btn prepend-icon="mdi-plus" @click="addIngredient">
+                Add ingredient
+            </v-btn>
+        </v-col>
+    </v-row>
+</v-container>
+
+<v-container>
+    <v-number-input
+        v-model="servingWeight"
+        label="Serving weight (g)"
+        :min="1"
+    ></v-number-input>
+
+    <v-card>
+        <p>
+            {{ serving.carbs }} g carbs
+        </p>
+        <p>
+            {{ serving.sugar }} g sugar
+        </p>
+    </v-card>
+</v-container>
 
 <v-data-table :headers="headers" :items="ingredients" hide-default-footer>
     <!-- eslint-disable-next-line vue/valid-v-slot this is from the example, not sure why linting dislikes -->
@@ -41,12 +73,20 @@
 
 <script setup lang="ts">
 
-import { ref, type Ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 
 let newIngredientName = ref("");
+let newIngredientWeight = ref(100);
 let newIngredientCarbs = ref(0);
 let newIngredientSugar = ref(0);
-let ingredients: Ref<{name: string, carbs: number, sugar: number}[]> = ref([]);
+let servingWeight = ref(100);
+interface Ingredient {
+    name: string;
+    weight: number;
+    carbs: number;
+    sugar: number;
+}
+let ingredients: Ref<Ingredient[]> = ref([]);
 
 let headers = [
     {
@@ -54,12 +94,16 @@ let headers = [
         title: "Name"
     },
     {
+        key: "weight",
+        title: "Weight (g)"
+    },
+    {
         key: "carbs",
-        title: "Carbs"
+        title: "Carbs (g/100 g)"
     },
     {
         key: "sugar",
-        title: "Sugar"
+        title: "Sugar (g/100 g)"
     },
     {
         key: "remove",
@@ -88,6 +132,7 @@ function addIngredient() {
 
     ingredients.value.push({
         name: newIngredientName.value,
+        weight: newIngredientWeight.value,
         carbs: newIngredientCarbs.value,
         sugar: newIngredientSugar.value
     });
@@ -101,5 +146,28 @@ function removeIngredient(name: string) {
     let index = ingredients.value.findIndex(i => i.name === name);
     ingredients.value.splice(index, 1);
 }
+
+let serving = computed(() => {
+    if(!ingredients.value.length) {
+        return { carbs: 0, sugar: 0 };
+    }
+
+    let carbsWeight = 0;
+    let sugarWeight = 0;
+    let recipeWeight = 0;
+    ingredients.value.forEach((i) => { recipeWeight += i.weight; });
+    ingredients.value.forEach((i) => {
+        carbsWeight += i.carbs / 100 * i.weight;
+        sugarWeight += i.sugar / 100 * i.weight;
+    });
+    let partCarbs = carbsWeight / recipeWeight;
+    let partSugar = sugarWeight / recipeWeight;
+    console.log(partCarbs);
+    let totals = {
+        carbs: partCarbs * servingWeight.value,
+        sugar: partSugar * servingWeight.value
+    };
+    return totals;
+});
 
 </script>
