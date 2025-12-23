@@ -137,6 +137,10 @@ watch(newIngredientName, async () => {
             break;
         }
     }
+    if(!id) {
+        return;
+    }
+
     let ingredientValues = await fetchIngredient(id);
     for(let value of ingredientValues) {
         if(value.euroFIRkod === "CHO") {
