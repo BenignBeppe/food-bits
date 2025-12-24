@@ -62,6 +62,19 @@
     </v-card>
 </v-container>
 
+<v-container>
+    <v-row>
+        <v-col>
+            <v-text-field label="Recipe name" v-model="recipeName"></v-text-field>
+        </v-col>
+        <v-col cols="auto">
+            <v-btn prepend-icon="mdi-content-save" @click="saveRecipe">
+                Save recipe
+            </v-btn>
+        </v-col>
+    </v-row>
+</v-container>
+
 <v-data-table
     :headers="headers"
     :items="recipe"
@@ -83,9 +96,9 @@
 <script setup lang="ts">
 
 import { computed, ref, watch, type Ref } from "vue";
-import { useStorage } from "@vueuse/core";
 
 import { fetchIngredient, fetchIngredients } from "../apiConnector.ts";
+import { recipe, recipeBook, recipeName } from "../recipes.ts";
 
 let availableIngredients: object;
 let ingredientNames: Ref<string[]> = ref([]);
@@ -94,15 +107,6 @@ let newIngredientWeight = ref(100);
 let newIngredientCarbs = ref(0);
 let newIngredientSugar = ref(0);
 let servingWeight = ref(100);
-
-interface Ingredient {
-    name: string;
-    weight: number;
-    carbs: number;
-    sugar: number;
-}
-let defaultRecipe: Ingredient[] = [];
-const recipe = useStorage("recipe", defaultRecipe);
 
 let headers = [
     {
@@ -180,6 +184,10 @@ function addIngredient() {
 
 function isEquivalent(string1: string, string2: string): boolean {
     return string1.toLowerCase().trim() === string2.toLowerCase().trim();
+}
+
+function saveRecipe() {
+    recipeBook.value[recipeName.value] = recipe.value;
 }
 
 function removeIngredient(name: string) {
