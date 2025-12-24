@@ -61,7 +61,12 @@
     </v-card>
 </v-container>
 
-<v-data-table :headers="headers" :items="recipe" hide-default-footer>
+<v-data-table
+    :headers="headers"
+    :items="recipe"
+    items-per-page="-1"
+    hide-default-footer
+>
     <!-- eslint-disable-next-line vue/valid-v-slot this is from the example, not sure why linting dislikes -->
     <template v-slot:item.remove={item}>
         <v-btn
