@@ -20,8 +20,11 @@ let recipeList = computed(() => {
     return list;
 });
 
-function setRecipe(e) {
-    console.log(e);
+function setRecipe(e: { id: unknown; }) {
+    if(typeof e.id !== "string") {
+        return;
+    }
+
     let name = e.id;
     let newRecipe = recipeBook.value[name];
     recipe.value = newRecipe;

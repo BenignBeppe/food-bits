@@ -9,4 +9,5 @@ interface Ingredient {
 let defaultRecipe: Ingredient[] = [];
 export let recipe = useStorage("recipe", defaultRecipe);
 export let recipeName = useStorage("recipeName", "");
-export let recipeBook = useStorage("recipeBook", {});
+let defaultRecipeBook: { [key: string]: Ingredient[] } = {};
+export let recipeBook = useStorage("recipeBook", defaultRecipeBook);
