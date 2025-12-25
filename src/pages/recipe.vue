@@ -191,7 +191,9 @@ function isEquivalent(string1: string, string2: string): boolean {
 }
 
 function saveRecipe() {
-    recipeBook.value[recipeName.value] = recipe.value;
+    // Need to create a new array here so it doesn't point to object in another
+    // recipe.
+    recipeBook.value[recipeName.value] = Array.from(recipe.value);
 }
 
 function removeIngredient(name: string) {
