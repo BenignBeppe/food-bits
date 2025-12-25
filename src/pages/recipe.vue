@@ -91,6 +91,10 @@
     </template>
 </v-data-table>
 
+<v-footer>
+    <p>Uses data from <a href="https://www.livsmedelsverket.se/om-oss/psidata/livsmedelsdatabasen">Livsmedelsverket's API</a> licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode.sv">CC-BY</a></p>
+</v-footer>
+
 </template>
 
 <script setup lang="ts">
